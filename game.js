@@ -17,8 +17,8 @@ stage.addChild(backPicture);
 var subTexture = PIXI.Texture.fromImage("submarine.png");
 var subSprite = new PIXI.Sprite(subTexture); // submarine sprite
 
-subSprite.anchor.x = 0.5;
-subSprite.anchor.y = 0.5;
+// subSprite.anchor.x = 0.5;
+// subSprite.anchor.y = 0.5;
 
 subSprite.position.x = 50;
 subSprite.position.y = 200;
@@ -77,20 +77,20 @@ document.addEventListener('keyup', keyupEventHandler);
 
 function movePlayer() {
     if(keys[87]) { // W key pressed
-        if(subSprite.position.y > subSprite.height/2){
+        if(subSprite.position.y > 0){
         subSprite.position.y -= 5;
         }
     }
     if(keys[83]) { // S key pressed
-        if(subSprite.position.y < renderer.height - subSprite.height/2)
+        if(subSprite.position.y < renderer.height - subSprite.height)
         subSprite.position.y += 5;
     }
     if(keys[65]) { // A key pressed
-        if(subSprite.position.x > subSprite.width/2)
+        if(subSprite.position.x > 0)
         subSprite.position.x -= 5;
     }
     if(keys[68]) { // D key pressed
-        if(subSprite.position.x < renderer.width - subSprite.width/2)
+        if(subSprite.position.x < renderer.width - subSprite.width)
         subSprite.position.x += 5;
     }
 }
@@ -98,11 +98,11 @@ function movePlayer() {
 function animate() {
     requestAnimationFrame(animate);
     movePlayer();
-    var spawnProb = .1;
+    var spawnProb = .04;
     if ( Math.random() < spawnProb){
         newFish = new PIXI.Sprite(fishTextures[Math.floor(Math.random() * fishTextures.length)]);
         newFish.position.x = 800;
-        newFish.position.y = Math.random()*(renderer.height-50)
+        newFish.position.y = Math.random()*(renderer.height)
         enemies.addChild(newFish);
     }
     //enemies.addChild(blueFishSprite) = Math.random() * 5;
