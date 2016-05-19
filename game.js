@@ -1,4 +1,5 @@
 var gameport = document.getElementById("gameport");
+var playing = true;
 
 // create renderer
 var renderer = PIXI.autoDetectRenderer(800, 600, {backgroundColor: 0x3344ee});
@@ -12,6 +13,20 @@ var backPicture = new PIXI.Sprite(PIXI.Texture.fromImage("background.png"));
 backPicture.position.x = 0;
 backPicture.position.y = 0;
 stage.addChild(backPicture);
+
+// extra features container
+var extras = new PIXI.Container();
+stage.addChild(extras);
+
+var largeBubTexture = PIXI.Texture.fromImage("bubble_large.png");
+var largeBubSprite = new PIXI.Sprite(largeBubTexture);
+var smallBubTexture = PIXI.Texture.fromImage("bubble_small.png");
+var smallBubSprite = new PIXI.Sprite(smallBubTexture);
+var mediumBubTexture = PIXI.Texture.fromImage("bubble_medium.png");
+var mediumBubSprite = new PIXI.Sprite(smallBubTexture);
+bubbleTextures = [largeBubTexture, smallBubTexture, mediumBubTexture];
+
+
 
 // create user sprite and texture
 var subTexture = PIXI.Texture.fromImage("submarine.png");
@@ -55,7 +70,12 @@ gameOverTexture.position.y = 0;
 gameOverTexture.visible = false;
 stage.addChild(gameOverTexture);
 
-
+// score
+var score = 0;
+var scoreCounter = new PIXI.Text("Score: 0", {font:"30px Comic Sans MS", fill: "#fff", strokeThickness: 5});
+scoreCounter.position.x = 5;
+scoreCounter.position.y = -5;
+stage.addChild(scoreCounter);
 
 
 // enemies.addChild(sharkSprite);
@@ -70,41 +90,59 @@ function keyupEventHandler(e) {
 
 function keydownEventHandler(e) {
     keys[e.which] = true;
+    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
 }
 
 document.addEventListener('keydown', keydownEventHandler);
 document.addEventListener('keyup', keyupEventHandler);
 
 function movePlayer() {
-    if(keys[87]) { // W key pressed
+    if(keys[87] || keys[38]) { // W key pressed
         if(subSprite.position.y > 0){
         subSprite.position.y -= 5;
         }
     }
-    if(keys[83]) { // S key pressed
+    if(keys[83] || keys[40]) { // S key pressed
         if(subSprite.position.y < renderer.height - subSprite.height)
         subSprite.position.y += 5;
     }
-    if(keys[65]) { // A key pressed
+    if(keys[65] || keys[37]) { // A key pressed
         if(subSprite.position.x > 0)
         subSprite.position.x -= 5;
     }
-    if(keys[68]) { // D key pressed
+    if(keys[68] || keys[39]) { // D key pressed
         if(subSprite.position.x < renderer.width - subSprite.width)
         subSprite.position.x += 5;
     }
 }
 
+function counter(){
+    if (playing){
+    scoreCounter.text = "Score: " + Math.floor(++score/50);
+    }
+}
+
+
 function animate() {
     requestAnimationFrame(animate);
     movePlayer();
     var spawnProb = .04;
+    var bubbleSpawn = .25;
     if ( Math.random() < spawnProb){
         newFish = new PIXI.Sprite(fishTextures[Math.floor(Math.random() * fishTextures.length)]);
         newFish.position.x = 800;
         newFish.position.y = Math.random()*(renderer.height)
         enemies.addChild(newFish);
     }
+    if (Math.random() < bubbleSpawn){
+        newBubble = new PIXI.Sprite(bubbleTextures[Math.floor(Math.random() * bubbleTextures.length)]);
+        newBubble.position.x = Math.random() * (renderer.width);
+        newBubble.position.y = 600;
+        extras.addChild(newBubble);
+    }
+    
     //enemies.addChild(blueFishSprite) = Math.random() * 5;
     //sharkSprite.position.x -= 1;
     //blueFishSprite.position.x -= Math.random() * 5
@@ -117,11 +155,16 @@ function animate() {
         // }
         fishies[i].position.x -= Math.random() * 2.5;
     }
+    var bubs = extras.children;
+    for (var i = 0; i < bubs.length; i++){
+        bubs[i].position.y -= Math.random() * 2.5;
+    }
     //sharkSprite.position.y -= Math.random() * 1;
     collision();
     //fishies[i].rotation += 1;
+    counter();
     renderer.render(stage);
-    
+
 }
 animate();
 
@@ -131,6 +174,7 @@ function collision() {
         if (!(fishies[i].position.x > (subSprite.position.x + subSprite.width) || (fishies[i].position.x + fishies[i].width) < subSprite.position.x || fishies[i].position.y > (subSprite.position.y + subSprite.height) || (fishies[i].position.y + fishies[i].height) < subSprite.position.y)){
             gameOverTexture.visible = true;
             document.removeEventListener('keydown', keydownEventHandler);
+            playing = false;
         }
     
     }
