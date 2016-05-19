@@ -1,5 +1,7 @@
 var gameport = document.getElementById("gameport");
 var playing = true;
+var spawnProb = .020;
+var bubbleSpawn = .25;
 
 // create renderer
 var renderer = PIXI.autoDetectRenderer(800, 600, {backgroundColor: 0x3344ee});
@@ -120,7 +122,7 @@ function movePlayer() {
 
 function counter(){
     if (playing){
-    scoreCounter.text = "Score: " + Math.floor(++score/50);
+    scoreCounter.text = "Score: " + Math.floor(++score/60);
     }
 }
 
@@ -128,8 +130,6 @@ function counter(){
 function animate() {
     requestAnimationFrame(animate);
     movePlayer();
-    var spawnProb = .04;
-    var bubbleSpawn = .25;
     if ( Math.random() < spawnProb){
         newFish = new PIXI.Sprite(fishTextures[Math.floor(Math.random() * fishTextures.length)]);
         newFish.position.x = 800;
@@ -153,7 +153,7 @@ function animate() {
         // if (fishies[i] == sharkSprite){
         //     fishies[i].rotation += 1;
         // }
-        fishies[i].position.x -= Math.random() * 2.5;
+        fishies[i].position.x -= Math.random() * 3+2;
     }
     var bubs = extras.children;
     for (var i = 0; i < bubs.length; i++){
@@ -162,6 +162,7 @@ function animate() {
     //sharkSprite.position.y -= Math.random() * 1;
     collision();
     //fishies[i].rotation += 1;
+    spawnProb += .000008;
     counter();
     renderer.render(stage);
 
